@@ -1,0 +1,91 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<title>registe</title>
+<link href="css/Reg.css" rel='stylesheet' type='text/css' />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script src="//cdn.staticfile.org/jquery/1.12.3/jquery.min.js"></script>
+<script type="text/javascript" src="../js/jquery-easyui-1.4.1/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../js/jquery-easyui-1.4.1/locale/easyui-lang-zh_CN.js"></script>
+<script src="js/layer-v3.1.1/layer/layer.js"></script>
+<script>
+
+function validate() {
+    var pwd1 = document.getElementById("pwd").value;
+   var pwd2 = document.getElementById("pwd1").value;
+<!-- 对比两次输入的密码 -->
+    if(pwd1 == pwd2)
+     {
+        document.getElementById("tishi").innerHTML="<font color='green'>两次密码相同</font>";
+        document.getElementById("button").disabled = false;
+     }
+else {
+        document.getElementById("tishi").innerHTML="<font color='red'>两次密码不相同</font>";
+        document.getElementById("button").disabled = true;
+     }
+}
+
+function Reg(){
+    var uid=$.trim($("#username").val());//获取用户名trim是去掉空格
+    var password=$.trim($("#pwd").val());//获取密码
+    var email=$.trim($("#email").val());
+   if(uid==""||password==""||email==""){
+        layer.alert("不能为空!",{
+        title:"提示",
+        icon:5, 
+        });
+    } else{
+    var user = {
+      "uid":uid,
+      "password":password,
+      "email":email
+  };
+  $.ajax({
+      url:"doRegist",
+      contentType:"application/json;charset=utf-8",
+      type:"post",
+      data:JSON.stringify(user),
+      dataType:"json",
+      headers:{"Content-Type":"application/json;charset=UTF-8"},
+      success:function (msg) {
+      if(msg == false){
+      layer.alert("用户名已存在!",{
+        title:"提示",
+        icon:5, 
+        });
+      }
+         else if(msg == true) {
+        layer.msg('注册成功,请前往邮箱激活',{icon:1});
+        window.setTimeout("javascript:location.href='https://mail.qq.com'",5000)
+          }
+      }
+  })
+}
+}
+</script>
+ <style type="text/css"></style>
+</head>
+<body>
+	<h1>注册</h1>
+		<div class="app-cam">
+			<div class="cam"><img src="images/timg.jpg" class="img-responsive" alt="" /></div>
+			
+			<input type="text"  class="ZH" placeholder="账号" id="username"  onkeyup="this.value=this.value.replace(/[^\w_]/g,'');" >
+			<input type="text" class="password" name="pwd" id="pwd"  placeholder="密码" onkeyup="this.value=this.value.replace(/[^\w_]/g,'');" >
+			<input type="text" class="password" name="pwd" id="pwd1" placeholder="确认密码" onkeyup="this.value=this.value.replace(/[^\w_]/g,''); validate()">
+			<span id="tishi"></span>
+			
+	 		<input type="text"  class="YX" placeholder="邮箱" id="email" >
+			<div class="submit"><input type="button" onclick="Reg()" value="注册"></div></div>
+				<div class="clear"></div>
+				
+				<div class="new">
+				
+					<div class="clear"></div>
+				</div>
+			
+		</div>
+
+</body>
+</html>

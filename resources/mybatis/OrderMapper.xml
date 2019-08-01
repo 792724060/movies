@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>     
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.saltedfish.mapper.OrderMapper">  
+    
+    <resultMap id="UandO" type="com.saltedfish.entity.User">
+        <id column="uid" property="uid"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="birthday" property="birthday"/>
+        <result column="phone" property="phone"/>
+        <result column="email" property="email"/>
+        <result column="money" property="money"/>
+        <result column="state" property="state"/>
+        <result column="code" property="code"/>
+        <collection property="order" ofType="com.saltedfish.entity.Order" >
+            <id column="oid" property="oid" />
+            <result column="orderdate" property="orderdate"/>
+            <result column="tofo" property="tofo"/>
+            <result column="amount" property="amount"/>
+            <result column="state" property="state"/>
+             <association property="schedule" javaType="com.saltedfish.entity.Schedule" >
+                 <id column="scid" property="scid" />
+                 <result column="number" property="number"/> 
+                 <result column="price" property="price"/>
+                 <result column="begindatetime" property="begindatetime"/>
+            </association>
+        </collection>
+    </resultMap>
+    
+     <resultMap id="OandScheAndM" type="com.saltedfish.entity.Order">
+           <id column="oid" property="oid" />
+            <result column="orderdate" property="orderdate"/>
+            <result column="tofp" property="tofp"/>
+            <result column="amount" property="amount"/>
+            <result column="hid" property="hid"></result>
+            <result column="uid" property="uid"></result>
+            <result column="state" property="state"/>
+            <association property="schedule" javaType="com.saltedfish.entity.Schedule" >
+                 <id column="scid" property="scid" />
+                 <result column="number" property="number"/> 
+                 <result column="price" property="price"/>
+                 <result column="begindatetime" property="begindatetime"/>
+                 <association property="movie" javaType="com.saltedfish.entity.Movie" >
+                       <id column="mid" property="mid" />
+                       <result column="type" property="type"/>
+                       <result column="name" property="name"/>
+                       <result column="engname" property="engname"/>
+                       <result column="country" property="country"/>
+                       <result column="mainactor" property="mainactor"/>
+                      <result column="director" property="director"/>
+                      <result column="corporation" property="corporation"/> 
+                      <result column="duration" property="duration"/>
+                      <result column="description" property="description"/>
+                      <result column="picture" property="picture"/>
+                      </association>
+                 </association>
+     </resultMap>
+    
+<!--     <resultMap id="OandScheAndSeat" type="com.saltedfish.entity.Order">
+        <id column="oid" property="oid" />
+        <result column="orderdate" property="orderdate"/>
+        <result column="tofo" property="tofo"/>
+        <result column="amount" property="amount"/>
+        <association property="order" javaType="com.saltedfish.entity.Schedule" >
+            <id column="scid" property="scid" />
+            <result column="number" property="number"/> 
+            <result column="price" property="price"/>
+            <result column="begindatetime" property="begindatetime"/>
+        </association>
+    </resultMap> -->
+    
+<!--     <select id="selectOrderByUid" parameterType="int" resultMap="UandO">
+       select * from `User` left join `Order` on `Order`.uid=`User`.uid 
+                  inner join Schedule on Schedule.scid=Order.scid  where `User`.uid=#{uid}
+    </select> -->
+    
+    <select id="selectOrderByUid" parameterType="String" resultMap="OandScheAndM">
+          select * from `Order` left join Schedule on Order.scid=Schedule.scid 
+                    inner join Movie on Schedule.mid=Movie.mid where Order.uid=#{uid} order by orderdate desc
+    </select>
+    
+    <select id="selectPreOrderByUid" parameterType="String" resultMap="OandScheAndM">
+          select * from `Order` left join Schedule on Order.scid=Schedule.scid 
+               inner join Movie on Schedule.mid=Movie.mid where Order.uid=#{uid} and begindatetime &lt; now() order by orderdate desc
+    </select>
+    
+    <select id="selectPreOrderByTime"  resultMap="OandScheAndM">
+         select * from `Order` left join Schedule on Order.scid=Schedule.scid 
+               inner join Movie on Schedule.mid=Movie.mid where Order.uid=#{uid} and begindatetime &lt; now()
+                     and #{begintime} &lt; orderdate and  orderdate &lt; #{endtime}
+    </select>
+    
+    <select id="selectTimeByUid" parameterType="String" resultType="java.util.Date">
+          select begindatetime from `Order` left join Schedule on Order.scid=Schedule.scid 
+                    where Order.uid=#{uid} and begindatetime > now() and Order.state=1
+    </select>
+    
+    <select id="sumAmountBYMid" resultMap="OandScheAndM">
+         select Movie.name as name,sum(amount) as amount from `Order` left join Schedule on Order.scid=Schedule.scid 
+                    inner join Movie on Schedule.mid=Movie.mid where Schedule.state=1 GROUP BY Schedule.mid 
+    </select>
+    
+    <select id="selectAllOrder" resultMap="OandScheAndM">
+          select * from `Order` left join Schedule on Order.scid=Schedule.scid 
+                    inner join Movie on Schedule.mid=Movie.mid 
+    </select>
+    
+    <insert id="insertOrder">
+        insert into `Order`(uid,hid,scid,tofp,amount) 
+                          values(#{uid},#{hid},#{scid},#{tofp},#{amount})
+    </insert>
+    
+    <update id="updateActive" >
+         update Seat set isActive='unavailable' where seat=#{seat} and number=#{number}
+    </update>
+    
+    <update id="dodateActive" parameterType="String">
+         update Seat set isActive='available' where seat=#{seat}
+    </update>
+    
+     <update id="updateStateByOid" parameterType="int">
+       update `Order` set state=0 where oid=#{oid} 
+    </update>
+    
+    </mapper>

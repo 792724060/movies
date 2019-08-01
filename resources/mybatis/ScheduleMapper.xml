@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.saltedfish.mapper.ScheduleMapper">  
+      
+    <resultMap id="ScheAndM" type="com.saltedfish.entity.Schedule">
+        <id column="scid" property="scid" />
+        <result column="number" property="number"/>
+        <result column="price" property="price"/>
+        <result column="begindatetime" property="begindatetime"/>
+        <result column="state" property="state"/>
+        <association property="movie" javaType="com.saltedfish.entity.Movie" >
+            <id column="mid" property="mid" />
+            <result column="type" property="type"/>
+            <result column="name" property="name"/>
+            <result column="engname" property="engname"/>
+            <result column="country" property="country"/>
+            <result column="mainactor" property="mainactor"/>
+            <result column="director" property="director"/>
+           <result column="corporation" property="corporation"/> 
+            <result column="duration" property="duration"/>
+            <result column="description" property="description"/>
+            <result column="picture" property="picture"/>
+        </association>
+    </resultMap>
+    
+    <resultMap id="ScheAndSeat" type="com.saltedfish.entity.Schedule">
+        <id column="scid" property="scid" />
+        <result column="number" property="number"/> 
+        <result column="price" property="price"/>
+        <result column="begindatetime" property="begindatetime"/>
+        <collection property="seatList" ofType="com.saltedfish.entity.Seat" >
+            <id column="sid" property="sid" />
+            <result column="number" property="number"/>
+            <result column="seat" property="seat"/>
+            <result column="isActive" property="isActive"/>
+            <association property="hall" javaType="com.saltedfish.entity.Hall" >
+                <id column="hid" property="hid" />
+                <result column="seats" property="seats"/>
+                <result column="description" property="description"/>
+            </association>
+        </collection>
+    </resultMap>
+    
+    <!-- <resultMap id="ScheAndMAndS" type="com.saltedfish.entity.Schedule">
+        <id column="scid" property="scid" />
+        <result column="number" property="number"/>
+        <result column="price" property="price"/>
+        <result column="begindatetime" property="begindatetime"/>
+        <association property="movie" javaType="com.saltedfish.entity.Movie" >
+            <id column="mid" property="mid" />
+            <result column="type" property="type"/>
+            <result column="name" property="name"/>
+            <result column="mainactor" property="mainactor"/>
+            <result column="director" property="director"/>
+            <result column="duration" property="duration"/>
+            <result column="description" property="description"/>
+            <result column="picture" property="picture"/>
+        </association>
+        <collection property="seatList" javaType="com.saltedfish.entity.Seat" >
+            <id column="sid" property="sid" />
+            <result column="number" property="number"/>
+            <result column="row" property="row"/>
+            <result column="column" property="column"/>
+            <result column="isActive" property="isActive"/>
+            <association property="hall" javaType="com.saltedfish.entity.Hall" >
+                <id column="hid" property="hid" />
+                <result column="seats" property="seats"/>
+                <result column="description" property="description"/>
+            </association>
+        </collection>
+    </resultMap>  -->
+    
+ <!--    <select id="selectAll" resultMap="ScheAndM">
+         select  * from Schedule left join Movie on Schedule.mid=Movie.mid 
+              where Schedule.scid in (select Min(Schedule.scid) FROM Schedule GROUP BY  Schedule.mid)  
+    </select> -->
+    
+    <select id="selectSome" resultMap="ScheAndM">
+         select  * from Schedule left join Movie on Schedule.mid=Movie.mid 
+              where state=1 and Schedule.scid in (select Min(Schedule.scid) FROM Schedule GROUP BY  Schedule.mid)  limit #{curPage},6
+    </select> 
+    
+    <select id="selectAll" resultMap="ScheAndM">
+         select  * from Schedule left join Movie on Schedule.mid=Movie.mid 
+              where Schedule.scid in (select Min(Schedule.scid) FROM Schedule GROUP BY  Schedule.mid) order by state desc
+    </select> 
+    
+    <select id="ScheduleCount" resultType="int" >		
+          select  Count(*) from Schedule where state=1 and scid in (select Max(scid) FROM Schedule GROUP BY mid) 
+    </select> 
+    
+    <select id="selectMidByName" parameterType="String" resultType="int">
+        select mid from Movie 
+              where name like CONCAT('%',#{name},'%') 
+        order by mid limit 1 						
+    </select>
+    
+    <select id="selectMovieByMid" parameterType="int" resultMap="ScheAndM">
+        <!-- select * from Schedule left join Movie on Movie.mid=Schedule.mid where Schedule.mid=#{mid} -->
+         select * from Schedule left join Movie on Movie.mid=Schedule.mid where Schedule.mid=#{mid} and scid in (select MIN(scid) FROM Schedule GROUP BY mid) 
+    </select>
+    
+    <select id="selectPictureBymid" parameterType="int" resultType="Picture">
+         select picture from Picture where mid=#{mid}
+    </select>
+    
+    <select id="selectAllByNumber" parameterType="int" resultMap="ScheAndSeat">
+       select * from Schedule left join Seat on Seat.number=Schedule.number 
+       inner join Hall on Seat.hid=Hall.hid where Schedule.number=#{number}
+    </select>  
+    
+    <select id="selectNumberByMid" resultType="Schedule" parameterType="int">
+        select * from Schedule where mid=#{mid} and begindatetime > now()
+    </select>
+    
+    <select id="selectSeatByNumber" parameterType="int" resultType="String">
+          select seat from Seat where number=#{number} and isActive='unavailable'
+    </select>  
+    
+    <insert id="insertSchedule"> 
+       insert into Schedule(mid,hid,number,price,begindatetime) 
+                          value(#{mid},#{hid},#{number},#{price},#{begindatetime})
+    </insert>
+    
+    <select id="selectMaxNumber" resultType="int"> 
+       select max(number) from Schedule 
+    </select>
+    
+    <insert id="insertSeat"> 
+       insert into Seat(hid,number,seat) 
+                          value(#{hid},#{number},#{seat})
+    </insert>
+    
+    
+    
+    
+    <update id="updateStateByScid" parameterType="int">
+       update Schedule set state=0 where mid=#{mid}
+    </update>
+    
+    <delete id="deleteNumber">
+    </delete>
+</mapper>

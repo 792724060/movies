@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+   
+    <!-- 3.配置数据源 ，使用的alibba的数据库-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <!-- 基本属性 url、user、password -->        
+        <property name="driverClassName" value="${jdbc_driverClassName}"/>
+        <property name="url" value="${jdbc_url}" />
+        <property name="username" value="${jdbc_username}"/>
+        <property name="password" value="${jdbc_password}"/>
+        <property name="initialSize" value="3" />
+	<!-- 最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请  默认值是0 -->
+	<property name="minIdle" value="3" />
+	<!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 ，0时无限制  默认值是8 -->
+	<property name="maxIdle" value="5" />
+	<!-- 连接池的最大值，同一时间可以从池分配的最多连接数量，0时无限制   默认值是8 -->
+	<property name="maxActive" value="15" />
+	<property name="validationQuery" value="SELECT 1" />
+	<property name="testOnBorrow" value="true"/>
+    </bean>
+    
+    <!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->  
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+        <property name="dataSource" ref="dataSource" />  
+           <!--指定MyBatis的核心配置文件-->
+<!--         <property name="configLocation" value="classpath:configure/mybatis-config.xml"/>   -->
+        <!-- 自动扫描mapping.xml文件 --> 
+         <property name="typeAliasesPackage" value="com.saltedfish.entity"  /> 
+         <property name="mapperLocations" value="classpath:mybatis/*.xml"/>   
+    </bean>   
+    
+     <!-- DAO接口所在包名，Spring会自动查找其下的类 ,自动扫描了所有的XxxxMapper.xml对应的mapper接口文件,只要Mapper接口类和Mapper映射文件对应起来就可以了-->  
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="com.saltedfish.mapper" />  
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property> 
+        <property name="annotationClass" value="org.springframework.stereotype.Repository"> </property> 
+    </bean>  
+</beans>

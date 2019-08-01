@@ -1,0 +1,111 @@
+@CHARSET "UTF-8";
+list{
+	margin: 0;
+    padding: 0;
+}
+.list ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #FF6600;
+}
+ 
+.list li {
+    float: left;
+}
+ 
+.list li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+ 
+
+.list li a:hover {
+    background-color: #111;
+}
+.box{
+	width:100%;
+	height:850px;
+	background: linear-gradient(to top, #336666, #336633,#339966);
+	
+}
+.box1{ 
+	height:700px;
+	width:800px;
+	position: absolute;
+	left:25%;
+	top:13%;
+	background-color:#181818;
+}
+.box2{
+	height:650px;
+	width:500px;
+	position: absolute;
+	left:5%;
+	top:7%;
+	background-color:#E8E8E8;
+}
+.box3{ position: absolute;
+	left:10%;
+   width:100%;
+ }
+
+#screen{
+    display: block;
+    width: 600px;
+    color: red;
+    font-weight: bold;
+    background-color: #FFFFFF;
+    border: 3px solid #af1313;
+    text-align: center;
+    margin: 10px auto 20px auto;
+}
+#seats{
+    border: 1px solid green;
+    width: 380px;
+    margin: 0 auto;
+    padding: 10px;
+    background: white;
+}
+.seat {
+    float: left;
+    width: 40px;
+    box-sizing: border-box;
+    color: #676767;
+    padding: 1px;
+    height: 40px;
+    background: #D8D8D8;
+    border: 1px solid #979797;
+    margin: 10px;
+    border-bottom: 3px solid #F35E4F;
+    cursor: pointer;
+}
+.seatsRaw {
+    display:inline-block;
+}
+#booking_desc {
+    width: 550px;
+    /* border: 1px solid red; */
+    background-color: #3C3636;
+    color: #FAFAFA;
+    margin: 30px auto;
+    padding: 10px;
+    display: table;
+    }
+.booking_left, .booking_right {
+    width:250px;
+    float:left;
+    }
+#total span {
+    font-size: 16px;
+    color: burlywood;
+    }
+#errMsg{
+    color: #FF7777;
+    }
+
+ 

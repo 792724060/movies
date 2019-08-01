@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>     
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.saltedfish.mapper.UserMapper">  
+      
+    <!-- <resultMap id="UandO" type="com.saltedfish.entity.User">
+        <id column="uid" property="uid"/>
+        <result column="password" property="password"/>
+        <result column="name" property="name"/>
+        <result column="sex" property="sex"/>
+        <result column="birthday" property="birthday"/>
+        <result column="phone" property="phone"/>
+        <result column="state" property="state"/>
+        <result column="code" property="code"/>
+        <collection property="order" ofType="com.saltedfish.entity.Order" >
+            <id column="oid" property="oid" />
+            <result column="orderdate" property="orderdate"/>
+            <result column="tofo" property="tofo"/>
+            <result column="amount" property="amount"/>
+        </collection>
+    </resultMap> -->
+
+    <select id="selectUserByUsernameAndPassword" resultType="user">
+        select * from User where uid=#{uid} and password=#{password}
+    </select>
+    
+    <insert id="insertUser" parameterType="user">
+       insert into User(uid,password,name,email,code) values(#{uid},#{password},#{name},#{email},#{code})
+    </insert> 
+    
+    <select id="selectUserByCode" resultType="user" parameterType="String">
+        select * from User where code=#{code}
+    </select>
+    
+    <update id="updateStateByCode">
+       update User set state=1 where code=#{code}
+    </update>
+    
+    <!-- <select id="selectOrderByUid" parameterType="int" resultMap="UandO">
+       select * from `User` left join `Order` on `Order`.uid=`User`.uid where `User`.uid=#{uid}
+    </select> -->
+    
+    </mapper>

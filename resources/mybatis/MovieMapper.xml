@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC 
+"-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+    <mapper namespace="com.saltedfish.mapper.MovieMapper"> 
+    
+    <resultMap id="MandSche" type="com.saltedfish.entity.Movie">
+        <id column="mid" property="mid" />
+        <result column="type" property="type"/>
+        <result column="name" property="name"/>
+        <result column="engname" property="engname"/>
+        <result column="country" property="country"/>
+        <result column="mainactor" property="mainactor"/>
+        <result column="director" property="director"/>
+        <result column="corporation" property="corporation"/> 
+        <result column="duration" property="duration"/>
+        <result column="description" property="description"/>
+        <result column="picture" property="picture"/>
+            <collection property="schedule" ofType="com.saltedfish.entity.Schedule" >
+                <id column="scid" property="scid" />
+                <result column="number" property="number"/>
+                <result column="price" property="price"/>
+                <result column="begindatetime" property="begindatetime"/>
+                <result column="state" property="state"/>
+           </collection>
+    </resultMap>
+    
+     <select id="selectAll" resultMap="MandSche">
+        select * from Movie left join Schedule on movie.mid=schedule.mid 
+<!--                       where scid in(select Min(scid) from Schedule group by mid) order by state desc -->
+     </select> 
+    
+    <insert id="insertMovie" parameterType="movie">
+        insert into Movie(name,engname,type,country,mainactor,director,corporation,duration,description,picture) 
+                          value(#{name},#{engname},#{type},#{country},#{mainactor},#{director},#{corporation},#{duration},#{description},#{picture})
+    </insert>
+    
+    <select id="selectMovieByMid" parameterType="int">
+        select * from Movie where mid=#{mid}
+    </select>
+    
+    </mapper>
